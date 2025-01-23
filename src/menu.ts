@@ -1,10 +1,4 @@
-import {
-	ImageData,
-	Menu,
-	NotificationsSDK,
-	ResetSettingsUpdated,
-	Sleeper
-} from "github.com/octarine-public/wrapper/index"
+import { ImageData, Menu } from "github.com/octarine-public/wrapper/index"
 
 export class MenuManager {
 	public readonly Size: Menu.Slider
@@ -15,10 +9,7 @@ export class MenuManager {
 
 	private readonly visual = Menu.AddEntry("Visual")
 	private readonly tree: Menu.Node
-
-	private readonly reset: Menu.Button
-	private readonly sleeper = new Sleeper()
-	private readonly iconNode = ImageData.Paths.Icons.icon_svg_duration
+	private readonly iconNode = ImageData.Icons.icon_svg_duration
 
 	constructor() {
 		this.tree = this.visual.AddNode(
@@ -34,7 +25,7 @@ export class MenuManager {
 			true,
 			"Show cooldown\nformat time (min:sec)",
 			-1,
-			ImageData.Paths.Icons.icon_svg_format_time
+			ImageData.Icons.icon_svg_format_time
 		)
 
 		this.Team = this.tree.AddDropdown(
@@ -53,29 +44,5 @@ export class MenuManager {
 			0,
 			"Additional timer size and icon image"
 		)
-
-		this.reset = this.tree.AddButton("Reset settings", "Reset settings on default")
-		this.reset.OnValue(() => this.ResetSettings())
-	}
-
-	public GameChanged() {
-		this.sleeper.FullReset()
-	}
-
-	private ResetSettings() {
-		if (!this.sleeper.Sleeping("ResetSettings")) {
-			this.resetValues()
-			this.tree.Update()
-			NotificationsSDK.Push(new ResetSettingsUpdated())
-			this.sleeper.Sleep(2 * 1000, "ResetSettings")
-		}
-	}
-
-	private resetValues() {
-		this.Size.value = this.Size.defaultValue
-		this.State.value = this.State.defaultValue
-		this.Team.SelectedID = this.Team.defaultValue
-		this.FormatTime.value = this.FormatTime.defaultValue
-		this.ModeImage.SelectedID = this.ModeImage.defaultValue
 	}
 }

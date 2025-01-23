@@ -14,9 +14,13 @@ import { TeamState } from "./enum"
 import { RespawnGUI } from "./gui"
 import { MenuManager } from "./menu"
 
-const bootstrap = new (class CRespawnESP {
+new (class CRespawnESP {
 	private readonly gui = new RespawnGUI()
 	private readonly menu = new MenuManager()
+
+	constructor() {
+		EventsSDK.on("Draw", this.Draw.bind(this))
+	}
 
 	protected get IsPostGame() {
 		return (
@@ -48,10 +52,6 @@ const bootstrap = new (class CRespawnESP {
 		}
 	}
 
-	public GameChanged() {
-		this.menu.GameChanged()
-	}
-
 	protected StateByTeam(player: PlayerCustomData) {
 		const teamMenu = this.menu.Team.SelectedID as TeamState,
 			isEnemy = player.IsEnemy(),
@@ -63,9 +63,3 @@ const bootstrap = new (class CRespawnESP {
 		)
 	}
 })()
-
-EventsSDK.on("Draw", () => bootstrap.Draw())
-
-EventsSDK.on("GameEnded", () => bootstrap.GameChanged())
-
-EventsSDK.on("GameStarted", () => bootstrap.GameChanged())
