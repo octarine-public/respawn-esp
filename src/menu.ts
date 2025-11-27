@@ -7,7 +7,7 @@ export class MenuManager {
 	public readonly ModeImage: Menu.Dropdown
 	public readonly FormatTime: Menu.Toggle
 
-	private readonly visual = Menu.AddEntry("Visual")
+	private readonly visual = Menu.AddEntryDeep(["Visual", "Maphack"])
 	private readonly tree: Menu.Node
 	private readonly iconNode = ImageData.Icons.icon_svg_duration
 
