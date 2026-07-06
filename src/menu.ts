@@ -45,4 +45,12 @@ export class MenuManager {
 			"Additional timer size and icon image"
 		)
 	}
+
+	public MenuChanged(callback: () => void) {
+		this.State.OnValue(() => callback())
+		this.FormatTime.OnValue(() => callback())
+		this.Team.OnValue(() => callback())
+		this.ModeImage.OnValue(() => callback())
+		this.Size.OnValue(() => callback())
+	}
 }

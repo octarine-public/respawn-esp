@@ -13,6 +13,8 @@ import {
 import { ModeImage } from "./enum"
 import { MenuManager } from "./menu"
 
+const RESPAWN_KIND = RendererSDK.AllocateAnchorKind()
+
 export class RespawnGUI {
 	private readonly baseSize = 22
 	private readonly position = new Rectangle()
@@ -27,6 +29,12 @@ export class RespawnGUI {
 		if (w2s === undefined || GUIInfo.Contains(w2s)) {
 			return
 		}
+		const hero = player.Hero!, // is checked
+			resTime = hero.RespawnTime,
+			remaining = this.GetRemainingTime(resTime)
+		if (!remaining) {
+			return
+		}
 		if (!this.Update(w2s, menu.Size.value)) {
 			return
 		}
@@ -34,16 +42,26 @@ export class RespawnGUI {
 		const formatTime = menu.FormatTime.value,
 			isCircle = menu.ModeImage.SelectedID === ModeImage.Round
 
-		const hero = player.Hero!, // is checked
-			playerColor = player.Color.Clone(),
-			resTime = hero.RespawnTime,
+		const playerColor = player.Color.Clone(),
 			maxDuration = hero.MaxRespawnDuration
 
 		const ratio = this.GetRatio(resTime, maxDuration),
-			remaining = this.GetRemainingTime(resTime),
 			texture = hero.TexturePath() ?? ImageData.GetHeroTexture(hero.Name)
 
-		this.Image(texture, ratio, isCircle, remaining, formatTime, playerColor)
+		const respawnPos = position.Clone(),
+			sizeDiv = this.baseBoxSize.DivideScalar(2).FloorForThis()
+		RendererSDK.DrawEntityRelative(
+			hero.Index,
+			RESPAWN_KIND,
+			() => {
+				const pos = RendererSDK.WorldToScreen(respawnPos)
+				if (pos === undefined || GUIInfo.Contains(pos)) {
+					return undefined
+				}
+				return GUIInfo.Contains(pos.Subtract(sizeDiv)) ? undefined : pos
+			},
+			() => this.Image(texture, ratio, isCircle, remaining, formatTime, playerColor)
+		)
 	}
 
 	protected Update(w2s: Vector2, additionalSize: number) {
@@ -51,11 +69,13 @@ export class RespawnGUI {
 		this.baseBoxSize.SetY(GUIInfo.ScaleHeight(this.baseSize + additionalSize))
 
 		const sizeDiv = this.baseBoxSize.DivideScalar(2).FloorForThis()
-		const position = w2s.SubtractForThis(sizeDiv)
-
-		this.position.pos1.CopyFrom(position)
-		this.position.pos2.CopyFrom(position.Add(this.baseBoxSize))
-		return !GUIInfo.Contains(this.position.pos1)
+		if (GUIInfo.Contains(w2s.Subtract(sizeDiv))) {
+			return false
+		}
+		const pos1 = sizeDiv.MultiplyScalar(-1)
+		this.position.pos1.CopyFrom(pos1)
+		this.position.pos2.CopyFrom(pos1.Add(this.baseBoxSize))
+		return true
 	}
 
 	protected Image(

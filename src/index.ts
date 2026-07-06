@@ -7,6 +7,7 @@ import {
 	GameRules,
 	GameState,
 	PlayerCustomData,
+	RendererSDK,
 	Team
 } from "github.com/octarine-public/wrapper/index"
 
@@ -19,7 +20,8 @@ new (class CRespawnESP {
 	private readonly menu = new MenuManager()
 
 	constructor() {
-		EventsSDK.on("Draw", this.Draw.bind(this))
+		EventsSDK.on("Draw2D", this.Draw.bind(this))
+		this.menu.MenuChanged(() => RendererSDK.InvalidateDraw2D())
 	}
 
 	protected get IsPostGame() {
