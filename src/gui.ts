@@ -1,14 +1,3 @@
-import {
-	Color,
-	GameState,
-	GUIInfo,
-	ImageData,
-	MathSDK,
-	PlayerCustomData,
-	Rectangle,
-	RendererSDK,
-	Vector2
-} from "github.com/octarine-public/wrapper/index"
 
 import { ModeImage } from "./enum"
 import { MenuManager } from "./menu"
@@ -133,7 +122,7 @@ export class RespawnGUI {
 	protected GetRemainingText(remainingTime: number, formatTime: boolean) {
 		if (remainingTime > 60) {
 			return formatTime
-				? MathSDK.FormatTime(remainingTime)
+				? Math.formatTime(remainingTime)
 				: Math.ceil(remainingTime).toFixed()
 		}
 		return remainingTime.toFixed(remainingTime < 2 ? 1 : 0)
