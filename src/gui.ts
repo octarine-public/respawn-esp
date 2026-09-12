@@ -1,4 +1,4 @@
-
+import { canvas } from "../render"
 import { ModeImage } from "./enum"
 import { MenuManager } from "./menu"
 
@@ -23,7 +23,7 @@ export class RespawnGUI {
 		const formatTime = menu.FormatTime.value,
 			isCircle = menu.ModeImage.SelectedID === ModeImage.Round
 
-		const hero = player.Hero!, // is checked
+		const hero = player.Hero!,
 			playerColor = player.Color.Clone(),
 			resTime = hero.RespawnTime,
 			maxDuration = hero.MaxRespawnDuration
@@ -63,17 +63,17 @@ export class RespawnGUI {
 		const alpha = this.GetAlpha(remaining)
 		const remText = this.GetRemainingText(remaining, formatTime)
 
-		// image hero
-		RendererSDK.Image(
-			texture,
-			position.pos1,
-			isCircle ? 0 : -1,
-			position.Size,
-			Color.White.SetA(alpha)
-		)
+		canvas.Image(texture, position.pos1, position.Size, {
+			color: Color.White.SetA(alpha),
+
+			circle: isCircle
+		})
 
 		this.DrawOutlinedType(isCircle, ratio, position, playerColor, alpha)
-		RendererSDK.TextByFlags(remText, position, Color.White.SetA(alpha), 2)
+		canvas.TextIn(remText, position, {
+			color: Color.White.SetA(alpha),
+			size: position.Height / 2 + 4
+		})
 	}
 
 	protected DrawOutlinedType(
@@ -91,32 +91,27 @@ export class RespawnGUI {
 		const border2x2 = GUIInfo.ScaleHeight(2)
 
 		if (!isCircle) {
-			RendererSDK.OutlinedRect(
-				position.pos1,
-				position.Size,
-				outline + border2x2,
-				playerColor
-			)
+			canvas.Rect(position.pos1, position.Size, {
+				color: Color.fromUint32(0),
+				borderColor: playerColor,
+				borderWidth: outline + border2x2
+			})
 			return
 		}
-		RendererSDK.Arc(
-			-90,
-			100,
-			position.pos1,
-			position.Size,
-			false,
-			outline + border2x2,
-			playerColor
-		)
-		RendererSDK.Arc(
-			-90,
-			ratio,
-			position.pos1,
-			position.Size,
-			false,
-			outline + GUIInfo.ScaleHeight(3),
-			Color.Black.SetA(alpha)
-		)
+		canvas.Circle(position.pos1, position.Size, {
+			color: Color.fromUint32(0),
+			borderColor: playerColor,
+			borderWidth: outline + border2x2,
+			start: -90,
+			sweep: -360
+		})
+		canvas.Circle(position.pos1, position.Size, {
+			color: Color.fromUint32(0),
+			borderColor: Color.Black.SetA(alpha),
+			borderWidth: outline + GUIInfo.ScaleHeight(3),
+			start: -90,
+			sweep: -ratio * 3.6
+		})
 	}
 
 	protected GetRemainingText(remainingTime: number, formatTime: boolean) {
