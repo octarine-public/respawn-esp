@@ -3,8 +3,3 @@ export const enum TeamState {
 	Enemy,
 	Ally
 }
-
-export const enum ModeImage {
-	Round,
-	Square
-}

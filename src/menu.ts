@@ -3,7 +3,6 @@ export class MenuManager {
 	public readonly Size: Menu.Slider
 	public readonly Team: Menu.Dropdown
 	public readonly State: Menu.Toggle
-	public readonly ModeImage: Menu.Dropdown
 	public readonly FormatTime: Menu.Toggle
 
 	private readonly visual = Menu.AddEntryDeep(["Visual", "Maphack"])
@@ -32,8 +31,6 @@ export class MenuManager {
 			["Allies and enemy", "Only enemy", "Only ally"],
 			1
 		)
-
-		this.ModeImage = this.tree.AddDropdown("Mode images", ["Circle", "Square"])
 
 		this.Size = this.tree.AddSlider(
 			"Additional size",
