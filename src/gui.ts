@@ -13,11 +13,13 @@ const SHADOW_MIN = 2
 const TEXT_SCALE = 0.35
 /** Tenths appear once the count drops under this many seconds. */
 const TENTHS_UNDER = 1
+/** The timer fades out over this many last seconds. */
+const FADE_SECONDS = 0.1
 
 /**
  * The respawn timer by the fountain, drawn as teleport-esp's and maphack's circular timers: the
  * hero's portrait as a disc, the player's color on the rim for the time left, a soft shadow all
- * round and the seconds over it. It fades out over the last second.
+ * round and the seconds over it. It fades out over the last tenth of a second.
  */
 export class RespawnGUI {
 	public Draw(player: PlayerCustomData, menu: MenuManager) {
@@ -49,7 +51,7 @@ export class RespawnGUI {
 			innerShadow: false,
 			text: this.GetRemainingText(remaining, menu.FormatTime.value),
 			textScale: TEXT_SCALE,
-			opacity: Math.min(remaining, 1)
+			opacity: Math.min(remaining / FADE_SECONDS, 1)
 		})
 	}
 
