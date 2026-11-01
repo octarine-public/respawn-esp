@@ -1,178 +1,70 @@
-import {
-	Color,
-	GameState,
-	GUIInfo,
-	ImageData,
-	MathSDK,
-	PlayerCustomData,
-	Rectangle,
-	RendererSDK,
-	Vector2
-} from "github.com/octarine-public/wrapper/index"
-
-import { ModeImage } from "./enum"
+import { canvas } from "../render"
 import { MenuManager } from "./menu"
 
-const RESPAWN_KIND = RendererSDK.AllocateAnchorKind()
+/** The timer's diameter before the menu's slider adds to it: 40 at the default, as teleport-esp. */
+const BASE_SIZE = 18
+/** The progress ring's width in pixels at 1080p, as on teleport-esp's and maphack's markers. */
+const RING_WIDTH = 2
+/** How far the drop shadow reaches out from the portrait, as a fraction of the diameter. */
+const SHADOW_FRACTION = 0.1
+/** The drop shadow's reach in pixels at the smallest the timer gets. */
+const SHADOW_MIN = 2
+/** The seconds' height as a fraction of the diameter. */
+const TEXT_SCALE = 0.35
+/** Tenths appear once the count drops under this many seconds. */
+const TENTHS_UNDER = 1
+/** The timer fades out over this many last seconds. */
+const FADE_SECONDS = 0.1
 
+/**
+ * The respawn timer by the fountain, drawn as teleport-esp's and maphack's circular timers: the
+ * hero's portrait as a disc, the player's color on the rim for the time left, a soft shadow all
+ * round and the seconds over it. It fades out over the last tenth of a second.
+ */
 export class RespawnGUI {
-	private readonly baseSize = 22
-	private readonly position = new Rectangle()
-	private readonly baseBoxSize = new Vector2()
-
 	public Draw(player: PlayerCustomData, menu: MenuManager) {
-		const position = player.RespawnPosition
-		if (position === undefined) {
+		const origin = player.RespawnPosition
+		if (origin === undefined) {
 			return
 		}
-		const w2s = RendererSDK.WorldToScreen(position)
-		if (w2s === undefined || GUIInfo.Contains(w2s)) {
+		const screen = RendererSDK.WorldToScreen(origin)
+		if (screen === undefined || GUIInfo.Contains(screen)) {
 			return
 		}
-		const hero = player.Hero!, // is checked
-			resTime = hero.RespawnTime,
-			remaining = this.GetRemainingTime(resTime)
+		const hero = player.Hero!
+		const remaining = this.GetRemainingTime(hero.RespawnTime)
 		if (!remaining) {
 			return
 		}
-		if (!this.Update(w2s, menu.Size.value)) {
+		const size = Math.round(GUIInfo.ScaleHeight(BASE_SIZE + menu.Size.value))
+		const position = screen.SubtractScalar(size / 2).RoundForThis()
+		if (GUIInfo.Contains(position)) {
 			return
 		}
-
-		const formatTime = menu.FormatTime.value,
-			isCircle = menu.ModeImage.SelectedID === ModeImage.Round
-
-		const playerColor = player.Color.Clone(),
-			maxDuration = hero.MaxRespawnDuration
-
-		const ratio = this.GetRatio(resTime, maxDuration),
-			texture = hero.TexturePath() ?? ImageData.GetHeroTexture(hero.Name)
-
-		const respawnPos = position.Clone(),
-			sizeDiv = this.baseBoxSize.DivideScalar(2).FloorForThis()
-		RendererSDK.DrawEntityRelative(
-			hero.Index,
-			RESPAWN_KIND,
-			() => {
-				const pos = RendererSDK.WorldToScreen(respawnPos)
-				if (pos === undefined || GUIInfo.Contains(pos)) {
-					return undefined
-				}
-				return GUIInfo.Contains(pos.Subtract(sizeDiv)) ? undefined : pos
-			},
-			() => this.Image(texture, ratio, isCircle, remaining, formatTime, playerColor)
-		)
-	}
-
-	protected Update(w2s: Vector2, additionalSize: number) {
-		this.baseBoxSize.SetX(GUIInfo.ScaleWidth(this.baseSize + additionalSize))
-		this.baseBoxSize.SetY(GUIInfo.ScaleHeight(this.baseSize + additionalSize))
-
-		const sizeDiv = this.baseBoxSize.DivideScalar(2).FloorForThis()
-		if (GUIInfo.Contains(w2s.Subtract(sizeDiv))) {
-			return false
-		}
-		const pos1 = sizeDiv.MultiplyScalar(-1)
-		this.position.pos1.CopyFrom(pos1)
-		this.position.pos2.CopyFrom(pos1.Add(this.baseBoxSize))
-		return true
-	}
-
-	protected Image(
-		texture: string,
-		ratio: number,
-		isCircle: boolean,
-		remaining: number,
-		formatTime: boolean,
-		playerColor: Color
-	) {
-		if (!remaining) {
-			return
-		}
-
-		const position = this.position
-		const alpha = this.GetAlpha(remaining)
-		const remText = this.GetRemainingText(remaining, formatTime)
-
-		// image hero
-		RendererSDK.Image(
-			texture,
-			position.pos1,
-			isCircle ? 0 : -1,
-			position.Size,
-			Color.White.SetA(alpha)
-		)
-
-		this.DrawOutlinedType(isCircle, ratio, position, playerColor, alpha)
-		RendererSDK.TextByFlags(remText, position, Color.White.SetA(alpha), 2)
-	}
-
-	protected DrawOutlinedType(
-		isCircle: boolean,
-		ratio: number,
-		position: Rectangle,
-		playerColor: Color,
-		alpha: number
-	) {
-		if (alpha < 255) {
-			playerColor.SetA(alpha)
-		}
-
-		const outline = position.Height / 15
-		const border2x2 = GUIInfo.ScaleHeight(2)
-
-		if (!isCircle) {
-			RendererSDK.OutlinedRect(
-				position.pos1,
-				position.Size,
-				outline + border2x2,
-				playerColor
-			)
-			return
-		}
-		RendererSDK.Arc(
-			-90,
-			100,
-			position.pos1,
-			position.Size,
-			false,
-			outline + border2x2,
-			playerColor
-		)
-		RendererSDK.Arc(
-			-90,
-			ratio,
-			position.pos1,
-			position.Size,
-			false,
-			outline + GUIInfo.ScaleHeight(3),
-			Color.Black.SetA(alpha)
-		)
+		const maxDuration = hero.MaxRespawnDuration
+		canvas.CircleTimer(position, size, {
+			texture: hero.TexturePath() ?? ImageData.GetHeroTexture(hero.Name),
+			progress: maxDuration > 0 ? Math.min(remaining / maxDuration, 1) : 0,
+			color: player.Color,
+			ringWidth: Math.max(1, Math.round(GUIInfo.ScaleHeight(RING_WIDTH))),
+			shadow: Math.max(Math.round(size * SHADOW_FRACTION), SHADOW_MIN),
+			innerShadow: false,
+			text: this.GetRemainingText(remaining, menu.FormatTime.value),
+			textScale: TEXT_SCALE,
+			opacity: Math.min(remaining / FADE_SECONDS, 1)
+		})
 	}
 
 	protected GetRemainingText(remainingTime: number, formatTime: boolean) {
 		if (remainingTime > 60) {
 			return formatTime
-				? MathSDK.FormatTime(remainingTime)
+				? Math.formatTime(remainingTime)
 				: Math.ceil(remainingTime).toFixed()
 		}
-		return remainingTime.toFixed(remainingTime < 2 ? 1 : 0)
+		return remainingTime.toFixed(remainingTime < TENTHS_UNDER ? 1 : 0)
 	}
 
 	protected GetRemainingTime(rsTime: number) {
 		return Math.max(rsTime - GameState.RawGameTime, 0)
-	}
-
-	protected GetRatio(rsTme: number, maxDuration: number) {
-		const remainingTime = this.GetRemainingTime(rsTme)
-		return Math.max(100 * (remainingTime / maxDuration), 0)
-	}
-
-	protected GetAlpha(remaining: number) {
-		let alpha = 255
-		if (remaining && remaining <= 1) {
-			alpha = Math.round(((remaining * 100) / 100) * 255)
-		}
-		return alpha
 	}
 }

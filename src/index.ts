@@ -1,16 +1,5 @@
 import "./translations"
 
-import {
-	DOTAGameState,
-	DOTAGameUIState,
-	EventsSDK,
-	GameRules,
-	GameState,
-	PlayerCustomData,
-	RendererSDK,
-	Team
-} from "github.com/octarine-public/wrapper/index"
-
 import { TeamState } from "./enum"
 import { RespawnGUI } from "./gui"
 import { MenuManager } from "./menu"
@@ -20,14 +9,13 @@ new (class CRespawnESP {
 	private readonly menu = new MenuManager()
 
 	constructor() {
-		EventsSDK.on("Draw2D", this.Draw.bind(this))
-		this.menu.MenuChanged(() => RendererSDK.InvalidateDraw2D())
+		EventsSDK.on("Draw", this.Draw.bind(this))
 	}
 
 	protected get IsPostGame() {
 		return (
-			GameRules === undefined ||
-			GameRules.GameState === DOTAGameState.DOTA_GAMERULES_STATE_POST_GAME
+			Dota2SDK.GameRules === undefined ||
+			Dota2SDK.GameRules.GameState === DOTAGameState.DOTA_GAMERULES_STATE_POST_GAME
 		)
 	}
 

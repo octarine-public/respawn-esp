@@ -1,10 +1,8 @@
-import { ImageData, Menu } from "github.com/octarine-public/wrapper/index"
 
 export class MenuManager {
 	public readonly Size: Menu.Slider
 	public readonly Team: Menu.Dropdown
 	public readonly State: Menu.Toggle
-	public readonly ModeImage: Menu.Dropdown
 	public readonly FormatTime: Menu.Toggle
 
 	private readonly visual = Menu.AddEntryDeep(["Visual", "Maphack"])
@@ -34,8 +32,6 @@ export class MenuManager {
 			1
 		)
 
-		this.ModeImage = this.tree.AddDropdown("Mode images", ["Circle", "Square"])
-
 		this.Size = this.tree.AddSlider(
 			"Additional size",
 			22,
@@ -44,13 +40,5 @@ export class MenuManager {
 			0,
 			"Additional timer size and icon image"
 		)
-	}
-
-	public MenuChanged(callback: () => void) {
-		this.State.OnValue(() => callback())
-		this.FormatTime.OnValue(() => callback())
-		this.Team.OnValue(() => callback())
-		this.ModeImage.OnValue(() => callback())
-		this.Size.OnValue(() => callback())
 	}
 }
