@@ -19,7 +19,9 @@ const FADE_SECONDS = 0.1
 /**
  * The respawn timer by the fountain, drawn as teleport-esp's and maphack's circular timers: the
  * hero's portrait as a disc, the player's color on the rim for the time left, a soft shadow all
- * round and the seconds over it. It fades out over the last tenth of a second.
+ * round and the seconds over it. It fades out over the last tenth of a second. It is laid out in
+ * px from a world anchor on the respawn point, which the core places when the frame is presented;
+ * the projection only drops a timer off the screen or under the HUD.
  */
 export class RespawnGUI {
 	public Draw(player: PlayerCustomData, menu: MenuManager) {
@@ -41,8 +43,10 @@ export class RespawnGUI {
 		if (GUIInfo.Contains(position)) {
 			return
 		}
-		const maxDuration = hero.MaxRespawnDuration
-		canvas.CircleTimer(position, size, {
+		const maxDuration = hero.MaxRespawnDuration,
+			corner = Math.round(-size / 2)
+		canvas.AnchorWorld(origin.x, origin.y, origin.z)
+		canvas.CircleTimer(new Vector2(corner, corner), size, {
 			texture: hero.TexturePath() ?? ImageData.GetHeroTexture(hero.Name),
 			progress: maxDuration > 0 ? Math.min(remaining / maxDuration, 1) : 0,
 			color: player.Color,
@@ -53,6 +57,7 @@ export class RespawnGUI {
 			textScale: TEXT_SCALE,
 			opacity: Math.min(remaining / FADE_SECONDS, 1)
 		})
+		canvas.Anchor()
 	}
 
 	protected GetRemainingText(remainingTime: number, formatTime: boolean) {
