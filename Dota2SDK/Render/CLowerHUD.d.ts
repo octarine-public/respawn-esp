@@ -49,9 +49,9 @@ declare class CLowerHUD extends CHUDSection {
 	 * The icon square of every ability the game is showing, left to right. Slots the unit does
 	 * not use are left out, so the length is the visible ability count.
 	 * @example
-	 * GUIInfo.LowerHUD.AbilitiesRects.forEach(rect =>
+	 * for (const rect of GUIInfo.LowerHUD.AbilitiesRects) {
 	 * 	RendererSDK.OutlinedRect(rect.pos1, rect.Size)
-	 * )
+	 * }
 	 */
 	public get AbilitiesRects(): Rectangle[]
 	/**
@@ -79,7 +79,10 @@ declare class CLowerHUD extends CHUDSection {
 	public get Buffs(): Nullable<Rectangle>
 	/** The debuff row above the HUD. */
 	public get Debuffs(): Nullable<Rectangle>
-	/** Re-derives the union rectangles the section owns. */
+	/**
+	 * Re-derives the union rectangles the section owns, and counts the ability and backpack slots
+	 * while the reading is open, so the first script to ask sees them.
+	 */
 	public Refresh(): void
 	public DebugDraw(): void
 }

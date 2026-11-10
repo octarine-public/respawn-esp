@@ -26,6 +26,10 @@ declare namespace Menu {
 		IsLoadingConfig: boolean
 		DrawMarksNew: boolean
 		DrawMarksNonDefault: boolean
+		KeepOriginalLogoColor: boolean
+		LogoColor: Nullable<string>
+		LogoSecondColor: Nullable<string>
+		WordmarkColor: Nullable<string>
 		HoverAnimation: boolean
 		IntroAnimation: boolean
 		MenuOpenAnimation: boolean
@@ -58,7 +62,7 @@ declare namespace Menu {
 	const Localization: MenuSDK.CLocalization
 	const MenuManager: MenuSDK.CMenuManager
 	const Theme: MenuSDK.CTheme
-	const ThemePresets: Map<string, MenuSDK.IThemeSeeds>
+	const ThemePresets: readonly MenuSDK.IThemePreset[]
 	const DefaultSeeds: MenuSDK.IThemeSeeds
 	const PaletteGroups: MenuSDK.IPaletteGroup[]
 	const PaletteTokenNames: Record<MenuSDK.PaletteColorToken, string>
@@ -76,6 +80,7 @@ declare namespace Menu {
 		readonly ArrowUpFromLine: "menu/ui/arrow-up-from-line.svg"
 		readonly BackdropLayers: "menu/ui/backdrop-layers.svg"
 		readonly BackdropSoft: "menu/ui/backdrop-soft.svg"
+		readonly BadgePlus: "menu/ui/badge-plus.svg"
 		readonly Ban: "menu/ui/ban.svg"
 		readonly Baseline: "menu/ui/baseline.svg"
 		readonly Blur: "menu/ui/blur.svg"
@@ -99,6 +104,9 @@ declare namespace Menu {
 		readonly CircleX: "menu/ui/circle-x.svg"
 		readonly Clock: "menu/ui/clock.svg"
 		readonly ClockSeconds: "menu/ui/clock-seconds.svg"
+		readonly CloudFog: "menu/ui/cloud-fog.svg"
+		readonly CloudSun: "menu/ui/cloud-sun.svg"
+		readonly Coins: "menu/ui/coins.svg"
 		readonly ControlLabel: "menu/ui/control-label.svg"
 		readonly DividerV: "menu/ui/divider-v.svg"
 		readonly DotNew: "menu/ui/dot-new.svg"
@@ -128,11 +136,13 @@ declare namespace Menu {
 		readonly LetterBold: "menu/ui/letter-bold.svg"
 		readonly LevelBars: "menu/ui/level-bars.svg"
 		readonly Lighting: "menu/ui/lighting.svg"
+		readonly Link2: "menu/ui/link-2.svg"
 		readonly ListBullet: "menu/ui/list-bullet.svg"
 		readonly ListFilter: "menu/ui/list-filter.svg"
 		readonly ListSplit: "menu/ui/list-split.svg"
 		readonly LockArea: "menu/ui/lock-area.svg"
 		readonly LockKeyhole: "menu/ui/lock-keyhole.svg"
+		readonly LockKeyholeOpen: "menu/ui/lock-keyhole-open.svg"
 		readonly Logo: "menu/ui/logo-mark.svg"
 		readonly Maximize2: "menu/ui/maximize-2.svg"
 		readonly MenuOpen: "menu/ui/menu-open.svg"

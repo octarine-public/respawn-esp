@@ -9,16 +9,20 @@ declare const Source2SDK: {
 	readonly CMainThread: typeof CMainThread
 	readonly CPanorama: typeof CPanorama
 	readonly CProjection: typeof CProjection
+	readonly CRenderAnchor: typeof CRenderAnchor
 	readonly CRenderer: typeof CRenderer
 	readonly CSoundSDK: typeof CSoundSDK
 	readonly CStringTablesManager: typeof CStringTablesManager
 	readonly CTaskManager: typeof CTaskManager
+	readonly CWorldDraw: typeof CWorldDraw
 	readonly ConVarsSDK: typeof ConVarsSDK
+	readonly ERenderAnchorFlags: typeof ERenderAnchorFlags
 	readonly EntityManager: CEntityManager<INativeEntity>
 	readonly Events: typeof Events
 	readonly GetNameByConstructor: (constructor: Constructor<INativeEntity>) => Nullable<string>
 	readonly InputManager: CInputManager
 	readonly InputMessage: typeof InputMessage
+	readonly InvalidateDraw2D: () => void
 	readonly MainThread: typeof MainThread
 	readonly NativeEvents: EventEmitter<NativeEventsMap>
 	readonly NetworkedParticle: typeof NetworkedParticle
@@ -30,4 +34,5 @@ declare const Source2SDK: {
 	readonly StringTables: typeof StringTables
 	readonly TaskManager: typeof TaskManager
 	readonly WASM: typeof WASM
+	readonly WorldDraw: typeof WorldDraw
 }

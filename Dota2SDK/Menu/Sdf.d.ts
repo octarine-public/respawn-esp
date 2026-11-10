@@ -15,6 +15,27 @@ declare namespace MenuSDK {
 	 */
 	function SdfRounded(radius: number, fill: string, borderW?: number, borderColor?: string): RmlStyle
 	/**
+	 * The radius a control is drawn at, in dp: `radius` on the theme's corner scale, or fully round -
+	 * a pill, or a circle on a square control - while the theme keeps its controls round.
+	 */
+	function ControlCornerRadius(radius: number): number
+	/**
+	 * {@link SdfRounded} for a control: a switch track and its knob, a slider's rail, fill and thumb,
+	 * a color swatch, the bar marking the selected row. It is rounded at `radius` on the theme's
+	 * corner scale like any fill, and fully round while the theme keeps its controls round.
+	 *
+	 * A round control touches its quad's edge, and a quad scaled by a transform lands on fractions
+	 * of a pixel the rasterizer cuts differently across and down - so a control that grows through
+	 * a transform passes `inset`, the pixels the quad stands out around the shape, or it flattens
+	 * into an oval as it grows.
+	 *
+	 * @example
+	 * <div style={{ width: 28, height: 18, ...SdfControl(9, Theme.AccentHex) }} />
+	 */
+	function SdfControl(radius: number, fill: string, inset?: number): RmlStyle
+	/** {@link SdfControl} with a live theme palette color, resolved at call time. */
+	function SdfControlTheme(radius: number, fill: keyof IThemePalette): RmlStyle
+	/**
 	 * The same fragment at an absolute radius, outside the theme's radius scale, and with the quad
 	 * grown by `inset` pixels on every side so the antialiased edge stays off its boundary. What is
 	 * drawn over the world keeps its own proportions — the menu's corner style is not its business —
@@ -68,6 +89,14 @@ declare namespace MenuSDK {
 	 */
 	function SdfSweep(radius: number, fill: string, percent: number, from?: number, inset?: number): RmlStyle
 	/**
+	 * The shape as a checkerboard: `light` with the `cell`-dp square at the shape's top-left corner
+	 * and every other one from it in `dark` - what shows through a translucent color laid over the
+	 * same shape. The squares are cut by the shader, so they run right up to the edge, rounded or
+	 * not, and share its coverage. The radius is absolute and `inset` grows the quad, as in
+	 * {@link SdfShape}.
+	 */
+	function SdfChecker(radius: number, light: string, dark: string, cell: number, inset?: number): RmlStyle
+	/**
 	 * Style fragment for a circle rendered by the same pipeline: the radius always collapses to the
 	 * element's half-extent, so the shape stays round at any size and skips the theme's radius scale
 	 * — a ring around an avatar has to match the avatar, not the menu's corner style. `inset` grows
@@ -78,8 +107,8 @@ declare namespace MenuSDK {
 	function SdfCircle(fill: string, borderW?: number, borderColor?: string, inset?: number, glowW?: number, glowColor?: string): RmlStyle
 	/**
 	 * The popover surface at a given radius: the menu glass made opaque and faded to 0.96, rimmed
-	 * with a 1dp panel border — the fill the context menu, the preset panels and the tooltips
-	 * share. Palette-reactive, so re-apply it on render like every SDF fragment.
+	 * with a 1dp panel border — the fill the preset panels and the tooltips share.
+	 * Palette-reactive, so re-apply it on render like every SDF fragment.
 	 */
 	function SdfPopoverTheme(radius: number): RmlStyle
 	/**
@@ -91,7 +120,7 @@ declare namespace MenuSDK {
 	 * panel build it. Palette-reactive like every SDF fragment.
 	 *
 	 * @example
-	 * <div style={{ borderRadius: Radius * Theme.RadiusScale, backdropFilter: Tokens.GlassBlur }}>
+	 * <div style={{ borderRadius: Radius, backdropFilter: Tokens.GlassBlur }}>
 	 * 	<div style={SdfPopoverGlass(Radius)}>{children}</div>
 	 * </div>
 	 */

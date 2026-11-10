@@ -8,13 +8,6 @@ declare namespace MenuSDK {
 	 * can never be pressed.
 	 */
 	function OpenTabContextMenu(event: Event, node: NodeEntry): void
-	/** Side of a tab icon in the rail, in dp — what the General «Icon size» setting picks. */
-	function RailIconSize(): number
-	/**
-	 * Draws the rail icons at the compact size instead of the default one. The caller
-	 * invalidates; nothing else in the rail changes size with them.
-	 */
-	function SetRailIconsSmall(small: boolean): void
 	/**
 	 * Drags the window from the element the press landed on. `onTap` is for a surface that answers a
 	 * click of its own: the press only turns out to be one once the button comes back up without the
@@ -22,6 +15,18 @@ declare namespace MenuSDK {
 	 * shield that carries the drag takes the release, so the surface never sees one.
 	 */
 	function BeginWindowDrag(event: Event, state: WindowState, onTap?: () => void): void
+	/**
+	 * Declares a layout box of the menu window a backdrop: a press on its own bare area - a gap
+	 * between the controls it holds, its padding - drags the window, while a press on anything
+	 * inside it stays with that thing. Hand it straight to `ref`.
+	 * @example
+	 * <div ref={MenuSDK.MarkWindowBackdrop} style={{ display: "flex", padding: 8 }}>
+	 * 	{cards}
+	 * </div>
+	 */
+	function MarkWindowBackdrop(element: HTMLElement | null | undefined): void
+	/** Starts a window drag when the press landed on a backdrop's own area. */
+	function DragFromBackdrop(event: Event): void
 	function TopCompressOf(state: {
 		w: number
 	}, tabs: NodeEntry[], current: number): number
