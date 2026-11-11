@@ -21,11 +21,13 @@ const FADE_SECONDS = 0.1
  * hero's portrait as a disc, the player's color on the rim for the time left, a soft shadow all
  * round and the seconds over it. It fades out over the last tenth of a second. It is laid out in
  * px from a world anchor on the respawn point, which the core places when the frame is presented;
- * the projection only drops a timer off the screen or under the HUD.
+ * the projection only drops a timer off the screen or under the HUD. A hero coming back where it
+ * died (the Aegis, Reincarnation) has its timer there, not by the fountain.
  */
 export class RespawnGUI {
 	public Draw(player: PlayerCustomData, menu: MenuManager) {
-		const origin = player.RespawnPosition
+		const hero = player.Hero!
+		const origin = hero.IsReincarnating ? hero.Position : player.RespawnPosition
 		if (origin === undefined) {
 			return
 		}
@@ -33,7 +35,6 @@ export class RespawnGUI {
 		if (screen === undefined || GUIInfo.Contains(screen)) {
 			return
 		}
-		const hero = player.Hero!
 		const remaining = this.GetRemainingTime(hero.RespawnTime)
 		if (!remaining) {
 			return
